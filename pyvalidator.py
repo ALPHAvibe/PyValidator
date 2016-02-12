@@ -13,6 +13,7 @@ class ValidationResponse(object):
 class ValueRule(object):
     def __init__(self, name, func, **kwargs):
         self.is_none_check = False
+        self.stop_on_error = False
         self.rule_func = func
         self.validation_error = ValidationError(name, **kwargs)
 
@@ -30,6 +31,7 @@ class PyValidator(object):
     def __init__(self):
         self.all_stops_on_first_error = False
         self._current_name = None
+        self._current_rule = None
         self._rulebooks = {}
 
     def validate(self, obj):
@@ -38,20 +40,17 @@ class PyValidator(object):
 
         response = ValidationResponse()
 
-        print(len(self._rulebooks))
         for rulebook in self._rulebooks.values():
             value = rulebook.value_func(obj)
             for rule in rulebook.rules:
                 if rulebook.allow_none and value is None and not rule.is_none_check:
-                    print('i should not be here')
                     continue
-                print('i should be here')
+
                 if not rule.rule_func(value):
-                    print('i should be here')
                     response.errors.append(rule.validation_error)
 
-                if self.all_stops_on_first_error or rulebook.stop_on_first_error:
-                    break
+                    if self.all_stops_on_first_error or rulebook.stop_on_first_error or rule.stop_on_error:
+                        break
 
         response.is_valid = len(response.errors) > 0
 
@@ -65,7 +64,15 @@ class PyValidator(object):
 
         return self
 
-    def rule_for(self, name, func):
+    def stop_on_error(self):
+        if self._current_rule is None:
+            raise AttributeError('Current rule not set')
+
+        self._current_rule.stop_on_error = True
+
+        return self
+
+    def rules_for(self, name, func):
         self._assert_name_arg(name)
         self._assert_func_arg(func)
         self._current_name = name
@@ -80,6 +87,7 @@ class PyValidator(object):
         self._rulebooks[self._current_name].allow_none = False
         rule = ValueRule(self._current_name, lambda x: x is not None, **kwargs)
         rule.is_none_check = True
+        self._current_rule = rule
         self._rulebooks[self._current_name]\
             .rules\
             .append(rule)
@@ -87,11 +95,16 @@ class PyValidator(object):
         return self
 
     def must(self, func, **kwargs):
+        if self._current_name is None:
+            raise AttributeError('Current rule name not set')
+
         kwargs = self._set_error_message('validation failed', **kwargs)
         self._assert_func_arg(func)
+        rule = ValueRule(self._current_name, func, **kwargs)
+        self._current_rule = rule
         self._rulebooks[self._current_name]\
             .rules\
-            .append(ValueRule(self._current_name, func, **kwargs))
+            .append(rule)
 
         return self
 

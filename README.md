@@ -9,14 +9,18 @@
     user.email = 'foo@bar.com'
 
     validator = PyValidator()\
-    .rule_for('first_name', lambda u: u.first_name)\
+    # declare 1rst rulebook for first name
+    .rules_for('first_name', lambda u: u.first_name)\
         .must_be_string()\
         .must(lambda x: len(x) is 10)\
-    .rule_for('last_name', lambda k: k.last_name)\
+    # declare 2nd rulebook for last_name
+    .rules_for('last_name', lambda k: k.last_name)\
         .must_be_string(error_message='lastname is string')\
-    .rule_for('email', lambda k: k.email)\
+    # declare 3rd rule_book for email
+    .rules_for('email', lambda k: k.email)\
         .must_be_string()\
-    .rule_for('age', lambda k: k.age)\
+    # declare 4th rulebook for age
+    .rules_for('age', lambda k: k.age)\
         .must_be_int()\
         .must_be_greater_than(18)\
 
@@ -50,3 +54,29 @@
             }
         ]
     }
+
+##Control flow for stopping validation
+    # calling stop_on_first_error() before declaring the first rule
+    # will be a global stop validation on first error for each rulebook
+
+    validator = PyValidator()\
+    .stop_on_first_error()\
+    .rules_for('first_name', lambda u: u.first_name)\
+        .must_be_string()\
+
+    # calling stop_on_first_error() after a rulebook will stop on first error
+    # for that rulebook and skip to the next rulebook
+
+    validator = PyValidator()\
+    .rules_for('first_name', lambda u: u.first_name)\
+        .stop_on_first_error()\
+        .must_be_string()\
+
+    # calling stop_on_error() will stop processing rules for that rulebook on error
+    # and continue to the next rulebook
+
+    validator = PyValidator()\
+    .rules_for('first_name', lambda u: u.first_name)\
+        .must_be_string()\
+            .stop_on_error()\
+        .must(lambda x: len(x) is 10)\
