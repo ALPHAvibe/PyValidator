@@ -10,40 +10,43 @@
 
     validator = PyValidator()\
     .rule_for('first_name', lambda u: u.first_name)\
-    .must_be_string()\
-    .must(lambda x: len(x) is 10)\
+        .must_be_string()\
+        .must(lambda x: len(x) is 10)\
     .rule_for('last_name', lambda k: k.last_name)\
-    .must_be_string(error_message='lastname is string')\
+        .must_be_string(error_message='lastname is string')\
     .rule_for('email', lambda k: k.email)\
-    .must_be_string()\
+        .must_be_string()\
     .rule_for('age', lambda k: k.age)\
-    .must_be_int()\
-    .must_be_greater_than(18)\
+        .must_be_int()\
+        .must_be_greater_than(18)\
 
     response = validator.validate(user)\
 
 # The response
-
-    [
-        {
-            'name': 'last_name',
-            'kwargs':
+    {
+        'is_valid': False
+        'errors':
+        [
             {
-                'error_message': 'lastname is string'
-            }
-        },
-        {
-            'name': 'age',
-            'kwargs':
+                'name': 'last_name',
+                'kwargs':
+                {
+                    'error_message': 'lastname is string'
+                }
+            },
             {
-                'error_message': 'must be greater'
-            }
-        },
-        {
-            'name': 'first_name',
-            'kwargs':
+                'name': 'age',
+                'kwargs':
+                {
+                    'error_message': 'must be greater'
+                }
+            },
             {
-                'error_message': 'validation failed'
+                'name': 'first_name',
+                'kwargs':
+                {
+                    'error_message': 'validation failed'
+                }
             }
-        }
-    ]
+        ]
+    }
