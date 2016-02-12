@@ -80,3 +80,22 @@
         .must_be_string()\
             .stop_on_error()\
         .must(lambda x: len(x) is 10)\
+
+##Upcoming Features
+##collection validator
+collection validation will validate a list property againts a provided PyValidation
+
+    validator = PyValidator()\
+    .rules_for('first_name', lambda u: u.first_name)\
+        .must_be_string()\
+        .collection_validator('addresses',  lambda u: u.addresses, address_validator)
+
+##rule sets
+Rule sets will allow you to tag what set rules should be executed with.
+You can pass rule set name to execute the membered rules only.
+
+    validator = PyValidator()\
+    .rules_for('first_name', lambda u: u.first_name)\
+        .must_be_string(rulet_sets=Set(['create', 'update']))
+        
+    validator.validate(obj, rule_set='update')
