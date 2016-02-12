@@ -50,3 +50,20 @@
             }
         ]
     }
+
+##Control flow for stopping validation
+    # calling stop_on_first_error() before declaring the first rule
+    # will be a global stop validation on the first error
+    
+    validator = PyValidator()\
+    .stop_on_first_error()\
+    .rule_for('first_name', lambda u: u.first_name)\
+        .must_be_string()\
+        
+    # calling stop_on_first_error() after a rule will stop on first error
+    # for that rule and continue on to the next rule
+    
+    validator = PyValidator()\
+    .rule_for('first_name', lambda u: u.first_name)\
+        .stop_on_first_error()\
+        .must_be_string()\
