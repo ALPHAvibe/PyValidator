@@ -96,6 +96,9 @@ You can pass rule set name to execute the membered rules only.
 
     validator = PyValidator()\
     .rules_for('first_name', lambda u: u.first_name)\
-        .must_be_string(rulet_sets=Set(['create', 'update']))
+        .must_be_string(rule_sets=Set(['create', 'update']))
         
     validator.validate(obj, rule_set='update')
+
+##conditional rules
+Allow a rule to only trigger if an optional conditional argument is True
