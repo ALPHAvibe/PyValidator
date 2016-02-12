@@ -43,11 +43,9 @@ class PyValidator(object):
             value = rulebook.value_func(obj)
             for rule in rulebook.rules:
                 if rulebook.allow_none and value is None and not rule.is_none_check:
-                    print('i should not be here')
                     continue
-                print('i should be here')
+                    
                 if not rule.rule_func(value):
-                    print('i should be here')
                     response.errors.append(rule.validation_error)
 
                 if self.all_stops_on_first_error or rulebook.stop_on_first_error:
