@@ -1,6 +1,6 @@
 #PyValidator
 
-##the basics
+##The basics
 
     user = User()
     user.first_name = 'foo'
@@ -22,7 +22,7 @@
 
     response = validator.validate(user)\
 
-# The response
+##The response
     {
         'is_valid': False
         'errors':
