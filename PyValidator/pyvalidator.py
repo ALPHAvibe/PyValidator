@@ -198,7 +198,7 @@ class PyValidator(object):
 
     @staticmethod
     def _execute_conditional_func(func, obj, obj_stack):
-        if 'osc' in inspect.signature(func).parameters:
+        if 'ocs' in inspect.signature(func).parameters:
             return func(obj, obj_stack)
         return func(obj)
 

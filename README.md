@@ -37,7 +37,7 @@
                 'name': 'age',
                 'kwargs':
                 {
-                    'error_message': 'must be greater'
+                    'error_message': 'must be greater than 18'
                 }
             },
             {
@@ -107,7 +107,7 @@ Until a new new 'when(func)' is declared. You can also pass the conditional argu
 when declaring a rule to add a conditional specific to that rule.
 
     phone_validator = PyValidator()\
-        .when(lambda p, osc: osc.top.previous.obj.type == 'business_contact')\
+        .when(lambda p, ocs: ocs.top.previous.obj.type == 'business_contact')\
         .rules_for('code', lambda o: o.code)\
             .not_none()\
             .is_string()\
@@ -133,7 +133,7 @@ against a provided PyValidation
 
 ##Object call stack
 Objects that have been called in a nested object can be accessed when setting conditional funcs
-and rule funcs. To access the object call stack you must add 'osc' as an argument for
+and rule funcs. To access the object call stack you must add 'ocs' as an argument for
 your funcs.
 
     child = child()
@@ -145,12 +145,11 @@ your funcs.
     child_validator = PyValidator()\
         .rules_for('last_name', lambda c: c.last_name)\
             .is_string()\
-            .must(lambda c, osc: osc.top.previous.obj.last_name == last_name)
+            .must(lambda c, ocs: ocs.top.previous.obj.last_name == last_name)
 
     parent_validator = PyValidator()\
         .rules_for('last_name', lambda u: u.last_name)\
             .is_string()\
         .rules_for('child', lambda u: u.child)
             .set_validator(child_validator)
-
 
