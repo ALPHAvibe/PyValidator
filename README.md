@@ -1,30 +1,25 @@
 #PyValidator
 
 ##The basics
-
     user = User()
     user.first_name = 'foo'
     user.last_name = 10
     user.age = 16
     user.email = 'foo@bar.com'
 
-    validator = PyValidator()\
-    # declare 1rst rulebook for first name
-    .rules_for('first_name', lambda u: u.first_name)\
-        .must_be_string()\
-        .must(lambda x: len(x) is 10)\
-    # declare 2nd rulebook for last_name
-    .rules_for('last_name', lambda k: k.last_name)\
-        .must_be_string(error_message='lastname is string')\
-    # declare 3rd rule_book for email
-    .rules_for('email', lambda k: k.email)\
-        .must_be_string()\
-    # declare 4th rulebook for age
-    .rules_for('age', lambda k: k.age)\
-        .must_be_int()\
-        .must_be_greater_than(18)\
+        validator = PyValidator()\
+        .rules_for('first_name', lambda u: u.first_name)\
+            .is_string()\
+            .must(lambda x: len(x) is 10)\
+        .rules_for('last_name', lambda u: u.last_name)\
+            .is_string(error_message='last_name is string')\
+        .rules_for('email', lambda u: u.email)\
+            .is_string()\
+        .rules_for('age', lambda u: u.age)\
+            .is_int()\
+            .is_greater_than(18)\
 
-    response = validator.validate(user)\
+        response = validator.validate(user)\
 
 ##The response
     {
@@ -35,7 +30,7 @@
                 'name': 'last_name',
                 'kwargs':
                 {
-                    'error_message': 'lastname is string'
+                    'error_message': 'last_name is string'
                 }
             },
             {
@@ -57,48 +52,105 @@
 
 ##Control flow for stopping validation
     # calling stop_on_first_error() before declaring the first rule
-    # will be a global stop validation on first error for each rulebook
+    # will be a global stop validation on first error for each property
 
     validator = PyValidator()\
-    .stop_on_first_error()\
-    .rules_for('first_name', lambda u: u.first_name)\
-        .must_be_string()\
-
-    # calling stop_on_first_error() after a rulebook will stop on first error
-    # for that rulebook and skip to the next rulebook
-
-    validator = PyValidator()\
-    .rules_for('first_name', lambda u: u.first_name)\
         .stop_on_first_error()\
-        .must_be_string()\
+        .rules_for('first_name', lambda u: u.first_name)\
+            .is_string()\
 
-    # calling stop_on_error() will stop processing rules for that rulebook on error
-    # and continue to the next rulebook
-
-    validator = PyValidator()\
-    .rules_for('first_name', lambda u: u.first_name)\
-        .must_be_string()\
-            .stop_on_error()\
-        .must(lambda x: len(x) is 10)\
-
-##Upcoming Features
-##collection validator
-collection validation will validate a list property againts a provided PyValidation
+    # calling stop_on_first_error() after a 'rules_for' will stop on first error
+    # for that property and skip to the next property rules
 
     validator = PyValidator()\
-    .rules_for('first_name', lambda u: u.first_name)\
-        .must_be_string()\
-        .collection_validator('addresses',  lambda u: u.addresses, address_validator)
+        .rules_for('first_name', lambda u: u.first_name)\
+            .stop_on_first_error()\
+            .is_string()\
 
-##rule sets
-Rule sets will allow you to tag what set rules should be executed with.
-You can pass rule set name to execute the membered rules only.
+    # calling stop_on_error() will stop processing rules for that property on error
+    # and continue to the next property rules
 
     validator = PyValidator()\
-    .rules_for('first_name', lambda u: u.first_name)\
-        .must_be_string(rule_sets=Set(['create', 'update']))
-        
+        .rules_for('first_name', lambda u: u.first_name)\
+            .is_string()\
+                .stop_on_error()\
+            .must(lambda x: len(x) is 10)\
+
+##Rule sets
+Rule sets will allow you to tag what set rules for execution. A good use for this
+is differing creation and update rules.
+
+    validator = PyValidator()\
+        .rules_for('first_name', lambda u: u.first_name)\
+            .is_string(rule_sets=Set(['create', 'update']))
+
+    # executes only rules tagged as 'update'
     validator.validate(obj, rule_set='update')
 
-##conditional rules
-Allow a rule to only trigger if an optional conditional argument is True
+    validator = PyValidator()\
+        .rules_for('first_name', lambda u: u.first_name)\
+            .is_string()\
+        .rules_for('deposit_amount', lambda u:deposit_amount)
+            .is_int()\
+            .is_greater_than(0)\
+            .is_less_than(500, conditional: lamda u: u.age < 18)\
+        .rules_for('age', lambda u: u.age)\
+
+
+    # executes only rules tagged as 'update'
+    validator.validate(obj, rule_set='update')
+
+##Conditional rules
+Conditional rules allows rules to only trigger when a condition is true.
+If you use the 'when(func)' method any rules afterwards will be grouped with the same condition.
+Until a new new 'when(func)' is declared. You can also pass the conditional argument
+when declaring a rule to add a conditional specific to that rule.
+
+    phone_validator = PyValidator()\
+        .when(lambda p, osc: osc.top.previous.obj.type == 'business_contact')\
+        .rules_for('code', lambda o: o.code)\
+            .not_none()\
+            .is_string()\
+            .is_length_between(0, 3, conditional=lambda x, osc:osc.top.previous.obj.country == 'US')\
+            .is_length_between(0, 5, conditional=lambda x, osc:osc.top.previous.obj.country == 'UK')\
+        .rules_for('number', lambda o: o.number)\
+            .not_none()\
+            .is_string()\
+            .is_length_equals(6, conditional=lambda x, osc:osc.top.previous.obj.country == 'US')\
+            .is_length_equals(9, conditional=lambda x, osc:osc.top.previous.obj.country == 'UK')\
+
+##Nested object validator
+Object validator will validate a class object property (or list of class objects)
+against a provided PyValidation
+
+    validator = PyValidator()\
+        .rules_for('first_name', lambda u: u.first_name)\
+            .is_string()\
+        .rules_for('phone_number', lambda u: u.phone_number)\
+            .set_validator(phone_validator)
+        .rules_for('addresses', lambda u: u.addresses)\
+            .set_validator(address_validator)
+
+##Object call stack
+Objects that have been called in a nested object can be accessed when setting conditional funcs
+and rule funcs. To access the object call stack you must add 'osc' as an argument for
+your funcs.
+
+    child = child()
+    child.last_name = 'Foo'
+    parent = Parent()
+    parent.last_name = 'Foo'
+    parent.child = child
+
+    child_validator = PyValidator()\
+        .rules_for('last_name', lambda c: c.last_name)\
+            .is_string()\
+            .must(lambda c, osc: osc.top.previous.obj.last_name == last_name)
+
+    parent_validator = PyValidator()\
+        .rules_for('last_name', lambda u: u.last_name)\
+            .is_string()\
+        .rules_for('child', lambda u: u.child)
+            .set_validator(child_validator)
+
+
