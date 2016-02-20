@@ -13,9 +13,6 @@ class ObjCallStack(object):
     def clone(self):
         call_stack = None
         for idx, obj in enumerate(self._calls_list):
-            if idx == 0:
-                call_stack = ObjCallStack(obj)
-            else:
-                call_stack.add(obj)
+            call_stack = ObjCallStack(obj) if idx == 0 else call_stack.add(obj)
 
         return call_stack

@@ -164,9 +164,7 @@ class PyValidator(object):
 
     def is_length_between(self, head, tail, **kwargs):
         kwargs = self._set_error_message('must be length between ' + str(head) + ' and ' + str(tail), **kwargs)
-        return self.must(
-                lambda o: o is not None and head <= len(o) <= tail, **kwargs
-            )
+        return self.must(lambda o: o is not None and head <= len(o) <= tail, **kwargs)
 
     def set_validator(self, validator, **kwargs):
         if not isinstance(validator, PyValidator):
@@ -187,19 +185,10 @@ class PyValidator(object):
         return kwargs
 
     @staticmethod
-    def _assert_name_arg(name):
-        if name is None or not isinstance(name, str) or len(name) <= 1:
-            raise ValueError('name')
-
-    @staticmethod
-    def _assert_func_arg(func):
-        if func is None or not callable(func):
-            raise ValueError('func')
-
-    @staticmethod
     def _execute_conditional_func(func, obj, obj_stack):
         if 'ocs' in inspect.signature(func).parameters:
             return func(obj, obj_stack)
+
         return func(obj)
 
     @staticmethod
@@ -213,6 +202,7 @@ class PyValidator(object):
             ocs_clone.add(value)
             value_response = validator.validate(ocs_clone, rule_set, prepend + '[' + str(idx) + ']')
             main_response = PyValidator._merge_validation_response(main_response, value_response)
+
         return main_response
 
     @staticmethod
@@ -223,3 +213,14 @@ class PyValidator(object):
         merged_response.errors = response1.errors + response2.errors
 
         return merged_response
+    @staticmethod
+    def _assert_name_arg(name):
+        if name is None or not isinstance(name, str) or len(name) <= 1:
+            raise ValueError('name')
+
+    @staticmethod
+    def _assert_func_arg(func):
+        if func is None or not callable(func):
+            raise ValueError('func')
+
+
