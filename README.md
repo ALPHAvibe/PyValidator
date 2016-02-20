@@ -81,17 +81,17 @@ Until a new new 'when(func)' is declared. You can also pass the conditional argu
 when declaring a rule to add a conditional specific to that rule.
 
     phone_validator = PyValidator()\
-        .when(lambda p, ocs: ocs.top.previous.obj.type == 'business_contact')\
+        .when(lambda p, ocs: ocs.top.prev.obj.type == 'business_contact')\
         .rules_for('code', lambda o: o.code)\
             .not_none()\
             .is_string()\
-            .is_length_between(0, 3, conditional=lambda x, osc:osc.top.previous.obj.country == 'US')\
-            .is_length_between(0, 5, conditional=lambda x, osc:osc.top.previous.obj.country == 'UK')\
+            .is_length_between(0, 3, conditional=lambda x, osc:osc.top.prev.obj.country == 'US')\
+            .is_length_between(0, 5, conditional=lambda x, osc:osc.top.prev.obj.country == 'UK')\
         .rules_for('number', lambda o: o.number)\
             .not_none()\
             .is_string()\
-            .is_length_equals(6, conditional=lambda x, osc:osc.top.previous.obj.country == 'US')\
-            .is_length_equals(9, conditional=lambda x, osc:osc.top.previous.obj.country == 'UK')\
+            .is_length_equals(6, conditional=lambda x, osc:osc.top.prev.obj.country == 'US')\
+            .is_length_equals(9, conditional=lambda x, osc:osc.top.prev.obj.country == 'UK')\
 
 ##Nested object validator
 Object validator will validate a class object property (or list of class objects) against
@@ -117,7 +117,7 @@ To access the object call stack you must add 'ocs' as an argument for your funcs
     child_validator = PyValidator()\
         .rules_for('last_name', lambda c: c.last_name)\
             .is_string()\
-            .must(lambda c, ocs: ocs.top.previous.obj.last_name == last_name)
+            .must(lambda c, ocs: ocs.top.prev.obj.last_name == last_name)
 
     parent_validator = PyValidator()\
         .rules_for('last_name', lambda u: u.last_name)\

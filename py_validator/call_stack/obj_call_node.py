@@ -1,4 +1,4 @@
 class ObjCallNode(object):
-    def __init__(self, obj, previous):
+    def __init__(self, obj, prev):
         self.obj = obj
-        self.previous = previous
+        self.prev = prev
