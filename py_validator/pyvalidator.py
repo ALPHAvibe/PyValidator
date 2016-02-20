@@ -164,6 +164,10 @@ class PyValidator(object):
         kwargs = self._set_error_message('must be length between ' + str(head) + ' and ' + str(tail), **kwargs)
         return self.must(lambda o: o is not None and head <= len(o) <= tail, **kwargs)
 
+    def has(self, x, **kwargs):
+        kwargs = self._set_error_message('key must be in dictionary', **kwargs)
+        return self.must(lambda o: x in o, **kwargs)
+
     def set_validator(self, validator, **kwargs):
         if not isinstance(validator, PyValidator):
             raise ValueError

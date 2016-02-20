@@ -118,5 +118,17 @@ class RulesTest(unittest.TestCase):
         self.assertTrue(not response.is_valid)
         self.assertEqual(len(response.errors), 1)
 
+    def test_has_true(self):
+        response = PyValidator().rules_for('value', lambda o: o).has('foo').validate({'foo'})
+        self.assertTrue(response.is_valid)
+        self.assertEqual(len(response.errors), 0)
+
+    def test_has_false(self):
+        response = PyValidator().rules_for('value', lambda o: o).has('foo').validate({'bar'})
+        self.assertTrue(not response.is_valid)
+        self.assertEqual(len(response.errors), 1)
+
+
+
 if __name__ == '__main__':
     unittest.main(exit=False)
