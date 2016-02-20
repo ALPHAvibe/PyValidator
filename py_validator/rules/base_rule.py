@@ -1,4 +1,4 @@
-from pyvalidator.response import *
+from py_validator.response import *
 
 
 class BaseRule(object):

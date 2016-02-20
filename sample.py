@@ -1,6 +1,6 @@
 import re
 from enum import Enum
-from pyvalidator import *
+from py_validator import *
 
 
 def valid_uuid(uuid):

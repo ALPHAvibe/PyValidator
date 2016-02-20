@@ -1,4 +1,4 @@
-from pyvalidator.rules import ValueRule
+from py_validator.rules import ValueRule
 
 
 class NotNoneRule(ValueRule):

@@ -1,4 +1,4 @@
-from pyvalidator.call_stack.obj_call_node import *
+from py_validator.call_stack.obj_call_node import *
 
 
 class ObjCallStack(object):

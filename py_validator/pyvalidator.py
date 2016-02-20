@@ -1,7 +1,7 @@
 import inspect
-from pyvalidator.call_stack import *
-from pyvalidator.rules import *
-from pyvalidator.response import *
+
+from py_validator.call_stack import *
+from py_validator.rules import *
 from .value_config import *
 
 

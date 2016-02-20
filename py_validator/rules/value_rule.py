@@ -1,4 +1,4 @@
-from pyvalidator.rules import BaseRule
+from py_validator.rules import BaseRule
 
 
 class ValueRule(BaseRule):
