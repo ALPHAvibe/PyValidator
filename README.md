@@ -94,8 +94,7 @@ when declaring a rule to add a conditional specific to that rule.
             .is_length_equals(9, conditional=lambda x, osc:osc.top.prev.obj.country == 'UK')\
 
 ##Nested object validator
-Object validator will validate a class object property (or list of class objects) against
-a provided PyValidation
+Value validator will validate a value (or list of values) against a designated PyValidator.
 
     validator = PyValidator()\
         .rules_for('first_name', lambda u: u.first_name)\
