@@ -6,15 +6,17 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from py_validator import *
 
 
-class PersonFoo(object):
-    def __init__(self):
-        self.first_name = ''
-        self.last_name = ''
-        self.age = ''
-        self.gender = None
+class RulesTest(unittest.TestCase):
 
+    def test_not_none_true(self):
+        response = PyValidator().rules_for('value', lambda o: o).not_none().validate('foo')
+        self.assertTrue(response.is_valid)
+        self.assertEqual(len(response.errors), 0)
 
-class PyValidatorTest(unittest.TestCase):
+    def test_not_none_false(self):
+        response = PyValidator().rules_for('value', lambda o: o).not_none().validate(None)
+        self.assertTrue(not response.is_valid)
+        self.assertEqual(len(response.errors), 1)
 
     def test_is_string_true(self):
         response = PyValidator().rules_for('value', lambda o: o).is_string().validate('foo')

@@ -16,8 +16,6 @@ class PyValidator(object):
         self._rules = []
 
     def validate(self, obj_stack, rule_set='__all__', prepend=''):
-        if obj_stack is None:
-            raise ValueError('obj')
         if not isinstance(obj_stack, ObjCallStack):
             obj_stack = ObjCallStack(obj_stack)
 
