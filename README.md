@@ -1,27 +1,30 @@
 #PyValidator
 
 ##The basics
+```python
     user = User()
     user.first_name = 'foo'
     user.last_name = 10
     user.age = 16
     user.email = 'foo@bar.com'
 
-        validator = PyValidator()\
-        .rules_for('first_name', lambda u: u.first_name)\
-            .is_string()\
-            .must(lambda x: len(x) is 10)\
-        .rules_for('last_name', lambda u: u.last_name)\
-            .is_string(error_message='last_name is string')\
-        .rules_for('email', lambda u: u.email)\
-            .is_string()\
-        .rules_for('age', lambda u: u.age)\
-            .is_int()\
-            .is_greater_than(18)\
+    validator = PyValidator()\
+    .rules_for('first_name', lambda u: u.first_name)\
+        .is_string()\
+        .must(lambda x: len(x) is 10)\
+    .rules_for('last_name', lambda u: u.last_name)\
+        .is_string(error_message='last_name is string')\
+    .rules_for('email', lambda u: u.email)\
+        .is_string()\
+    .rules_for('age', lambda u: u.age)\
+        .is_int()\
+        .is_greater_than(18)\
 
-        response = validator.validate(user)\
+    response = validator.validate(user)\
+```
 
 ##The response
+```javascript
     {
         'is_valid': False
         'errors':
@@ -49,11 +52,11 @@
             }
         ]
     }
-
+```
 ##Rule sets
 Rule sets will allow you to tag what rule set is executed. A good use for this
 is differing creation and update rules. Default is all rules will be ran.
-
+```python
     validator = PyValidator()\
         .rules_for('first_name', lambda u: u.first_name)\
             .is_string(rule_sets=Set(['create', 'update']))
@@ -70,16 +73,15 @@ is differing creation and update rules. Default is all rules will be ran.
             .is_less_than(500, conditional: lamda u: u.age < 18)\
         .rules_for('age', lambda u: u.age)\
 
-
     # executes only rules tagged as 'update'
     validator.validate(obj, 'update')
-
+```
 ##Conditional rules
 Conditional rules allows rules to only trigger when true.
 If you use the 'when(func)' method any rules afterwards will be grouped with the same condition.
 Until a new new 'when(func)' is declared. You can also pass the conditional argument
 when declaring a rule to add a conditional specific to that rule.
-
+```python
     phone_validator = PyValidator()\
         .when(lambda p, ocs: ocs.top.prev.obj.type == 'business_contact')\
         .rules_for('code', lambda o: o.code)\
@@ -92,10 +94,10 @@ when declaring a rule to add a conditional specific to that rule.
             .is_string()\
             .is_length_equals(6, conditional=lambda x, osc:osc.top.prev.obj.country == 'US')\
             .is_length_equals(9, conditional=lambda x, osc:osc.top.prev.obj.country == 'UK')\
-
+```
 ##Nested object validator
 Value validator will validate a value (or list of values) against a designated PyValidator.
-
+```python
     validator = PyValidator()\
         .rules_for('first_name', lambda u: u.first_name)\
             .is_string()\
@@ -103,10 +105,10 @@ Value validator will validate a value (or list of values) against a designated P
             .set_validator(phone_validator)
         .rules_for('addresses', lambda u: u.addresses)\
             .set_validator(address_validator)
-
+```
 ##Object call stack
 To access the object call stack you must add 'ocs' as an argument for your funcs.
-
+```python
     child = child()
     child.last_name = 'Foo'
     parent = Parent()
@@ -123,11 +125,11 @@ To access the object call stack you must add 'ocs' as an argument for your funcs
             .is_string()\
         .rules_for('child', lambda u: u.child)
             .set_validator(child_validator)
-
+```
 ##Control flow for stopping validation
     # calling stop_on_first_error() before declaring the first rule
     # will be a global stop validation on first error for each property
-
+```python
     validator = PyValidator()\
         .stop_on_first_error()\
         .rules_for('first_name', lambda u: u.first_name)\
@@ -149,3 +151,4 @@ To access the object call stack you must add 'ocs' as an argument for your funcs
             .is_string()\
                 .stop_on_error()\
             .must(lambda x: len(x) is 10)\
+```
