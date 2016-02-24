@@ -126,10 +126,12 @@ To access the object call stack you must add 'ocs' as an argument for your funcs
         .rules_for('child', lambda u: u.child)
             .set_validator(child_validator)
 ```
+
 ##Control flow for stopping validation
+```python
     # calling stop_on_first_error() before declaring the first rule
     # will be a global stop validation on first error for each property
-```python
+
     validator = PyValidator()\
         .stop_on_first_error()\
         .rules_for('first_name', lambda u: u.first_name)\
