@@ -118,7 +118,7 @@ To access the object call stack you must add 'ocs' as an argument for your funcs
     child_validator = PyValidator()\
         .rules_for('last_name', lambda c: c.last_name)\
             .is_string()\
-            .must(lambda c, ocs: ocs.top.prev.obj.last_name == last_name)
+            .must(lambda c, ocs: ocs.top.prev.obj.last_name == c.last_name)
 
     parent_validator = PyValidator()\
         .rules_for('last_name', lambda u: u.last_name)\
